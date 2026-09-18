@@ -8,5 +8,5 @@ crons = ["0 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "digikala-price-history"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "7b32478e-f9a7-489f-bfd0-53ad8c50461e"
 
