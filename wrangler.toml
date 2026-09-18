@@ -1,0 +1,15 @@
+name = "digikala-mcp"
+main = "src/worker.js"
+compatibility_date = "2026-09-19"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "digikala-price-history"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = []
