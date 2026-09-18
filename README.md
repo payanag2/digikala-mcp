@@ -22,7 +22,7 @@ Any MCP client, **one URL**. Cline / Cursor / Claude Desktop (`mcp.json` style):
 
 Then just talk: **"best Samsung phone under 20 million Toman"**, **"is this laptop any good?"**, **"what is on deal today?"**, **"what is popular in Iran right now?"**.
 
-## 16 tools
+## 18 tools
 
 | Tool | What it answers |
 |---|---|
@@ -42,6 +42,8 @@ Then just talk: **"best Samsung phone under 20 million Toman"**, **"is this lapt
 | `incredible_offers` | **Today's deals** (شگفت‌انگیز + other promotions) |
 | `best_selling` | Site-wide bestsellers, with category ids to go deeper |
 | `similar_products` | "What else is like this?" - Digikala's own recommendations |
+| `find_real_price_drops` | Find real price drops from this install's D1 history |
+| `price_history` | Show locally collected price snapshots for a product |
 
 Notes for agent builders:
 
@@ -76,7 +78,8 @@ flowchart LR
 What this means:
 
 - **Stateless.** Every request stands alone - no sessions, no accounts, nothing to log in to.
-- **Read-only.** All 16 tools carry `readOnlyHint`. Nothing here can change, delete or order anything.
+- **Read-only.** All 18 tools carry `readOnlyHint`. Nothing here can change, delete or order anything.
+- **Price tracker fork.** This fork adds Cloudflare D1 storage plus an hourly Cron collector for deal prices.
 - **No storage.** The only memory is a short-lived response cache (minutes, per isolate). Prices, stock and discounts are re-read from Digikala every time the cache expires.
 - **Rate-limit aware.** Requests are paced and retried with backoff, so bursts never leave this box as bursts.
 - **Undocumented upstream.** Digikala's public API can change without notice - this service tracks it and adapts, which is exactly why the [verify script](scripts/verify-live.mjs) exists.
@@ -89,7 +92,7 @@ Don't take my word for it - check the live server yourself:
 node scripts/verify-live.mjs   # needs Node.js 18+, nothing to install
 ```
 
-It lists all 16 tools over Streamable HTTP, runs a search + details read + error paths, and asserts the honest-data contract. The same script runs **hourly in CI** ([![Live verify](https://github.com/mmdju/digikala-mcp/actions/workflows/verify.yml/badge.svg)](https://github.com/mmdju/digikala-mcp/actions/workflows/verify.yml)) - if the endpoint or Digikala's API drifts, the badge goes red. See [docs/architecture.md](docs/architecture.md) for how a question becomes an answer, and [examples/python.py](examples/python.py) for a copy-paste client.
+It lists the upstream 16 tools; this fork additionally exposes 2 local price-tracker tools, runs a search + details read + error paths, and asserts the honest-data contract. The same script runs **hourly in CI** ([![Live verify](https://github.com/mmdju/digikala-mcp/actions/workflows/verify.yml/badge.svg)](https://github.com/mmdju/digikala-mcp/actions/workflows/verify.yml)) - if the endpoint or Digikala's API drifts, the badge goes red. See [docs/architecture.md](docs/architecture.md) for how a question becomes an answer, and [examples/python.py](examples/python.py) for a copy-paste client.
 
 ## Data source
 
@@ -98,6 +101,10 @@ Digikala's public web API (**undocumented, may change without notice**). This pr
 ## Status
 
 **Free public service** on Cloudflare Workers. **Fair use applies** - if you hammer it, you will be rate-limited.
+
+## Price Tracker fork
+
+See `README_PRICE_TRACKER.md` for Cloudflare Worker + D1 deployment. The tracker currently uses the original public MCP endpoint as its upstream data source while keeping price history in your own D1 database.
 
 ## License
 
